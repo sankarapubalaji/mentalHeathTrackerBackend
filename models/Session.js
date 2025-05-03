@@ -9,6 +9,7 @@ const sessionSchema = new mongoose.Schema({
   title: { type: String, required: true },
   date: { type: Date, required: true },
   description: { type: String, required: true },
+  link: { type: String, required: true }, // New field for session link
   psychiatrist: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   feedback: [feedbackSchema],

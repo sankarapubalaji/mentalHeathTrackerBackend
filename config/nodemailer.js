@@ -53,4 +53,47 @@ const sendVerificationEmail = async (to, name, token) => {
   }
 };
 
-export default sendVerificationEmail;
+// Send Consultation Email
+const sendConsultationEmail = async (to, patientName, doctorName, contact, email, concern, timing) => {
+  try {
+    const mailOptions = {
+      from: `"Mental Health Support" <${process.env.EMAIL_USER}>`,
+      to,
+      subject: `Consultation Request from Dr. ${doctorName}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+          <h2 style="color: #333;">Consultation Request</h2>
+          <p style="color: #555;">Dear ${patientName},</p>
+          <p style="color: #555;">Dr. ${doctorName} would like to schedule a consultation with you. Please review the details below and respond at your earliest convenience:</p>
+          <ul style="color: #555; list-style-type: none; padding: 0;">
+            <li><strong>Doctor's Name:</strong> Dr. ${doctorName}</li>
+            <li><strong>Contact:</strong> ${contact}</li>
+            <li><strong>Email:</strong> ${email}</li>
+            <li><strong>Concern:</strong> ${concern}</li>
+            <li><strong>Proposed Timing:</strong> ${timing}</li>
+          </ul>
+          <p style="color: #555;">Best regards,<br>Mental Health Support Team</p>
+        </div>
+      `,
+      text: `
+        Dear ${patientName},\n\n
+        Dr. ${doctorName} would like to schedule a consultation with you. Please review the details below and respond at your earliest convenience:\n\n
+        Doctor's Name: Dr. ${doctorName}\n\n
+        Contact: ${contact}\n\n
+        Email: ${email}\n\n
+        Concern: ${concern}\n\n
+        Proposed Timing: ${timing}\n\n
+        Best regards,\n\n
+        Mental Health Support Team
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`Consultation email sent to ${to}`);
+  } catch (error) {
+    console.error(`Error sending consultation email to ${to}:`, error);
+    throw new Error(`Failed to send consultation email: ${error.message}`);
+  }
+};
+
+export { sendVerificationEmail, sendConsultationEmail };

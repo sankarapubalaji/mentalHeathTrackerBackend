@@ -1,17 +1,19 @@
 import express from 'express';
 import Material from '../models/Material.js';
-import auth, { isPsychiatrist } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Submit Material
-router.post('/', auth, async (req, res) => {
+// Submit Material (No auth)
+router.post('/', async (req, res) => {
   try {
+    const { userId, title, type, url } = req.body;
+    if (!userId) return res.status(400).json({ message: 'User ID required' });
+
     const material = new Material({
-      user: req.user.id,
-      title: req.body.title,
-      type: req.body.type,
-      url: req.body.url,
+      user: userId,
+      title,
+      type,
+      url,
     });
     await material.save();
     await material.populate('user', 'fullName');
@@ -21,8 +23,8 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-// Get All Materials
-router.get('/', auth, async (req, res) => {
+// Get All Materials (No auth)
+router.get('/', async (req, res) => {
   try {
     const materials = await Material.find()
       .populate('user', 'fullName')
@@ -33,9 +35,12 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-// Approve Material (Psychiatrist only)
-router.put('/:id/approve', auth, isPsychiatrist, async (req, res) => {
+// Approve Material (No isPsychiatrist auth, but still requires userId)
+router.put('/:id/approve', async (req, res) => {
   try {
+    const { userId } = req.body;
+    if (!userId) return res.status(400).json({ message: 'User ID required' });
+
     const material = await Material.findById(req.params.id);
     if (!material) return res.status(404).json({ message: 'Material not found' });
 
